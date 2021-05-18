@@ -77,6 +77,21 @@ kalloc(void)
   release(&kmem.lock);
 
   if(r)
-    memset((char*)r, 5, PGSIZE); // fill with junk
+    memset((char*)r, 5, PGSIZE); // fill with junk 5是垃圾
   return (void*)r;
+}
+
+// 只需要遍历freelist就知道有多少页
+uint64 freemem(void) {
+  uint64 freebytes = 0;
+  acquire(&kmem.lock);
+
+  struct run *p = kmem.freelist;
+  while (p) {
+    freebytes += PGSIZE;
+    p = p->next;
+  }
+  
+  release(&kmem.lock);
+  return freebytes;
 }

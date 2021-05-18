@@ -21,6 +21,17 @@ static void freeproc(struct proc *p);
 
 extern char trampoline[]; // trampoline.S
 
+// the number of processes whose state is not UNUSED
+uint64 unusedproc(void) {
+  int nums = 0;
+  for (int i = 0; i < NPROC; i++) {
+    if (proc[i].state != UNUSED) {
+      nums++;
+    }
+  }
+  return nums;
+}
+
 // initialize the proc table at boot time.
 void
 procinit(void)
@@ -294,6 +305,9 @@ fork(void)
   pid = np->pid;
 
   np->state = RUNNABLE;
+
+  // copy trace mask
+  np->trace_mask = p->trace_mask;
 
   release(&np->lock);
 
